@@ -1,0 +1,56 @@
+﻿  Source.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(392,75): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'Source.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(392,75):
+      the template instantiation context (the oldest one first) is
+          C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\Source.cpp(78,29):
+          see reference to function template instantiation 'Difference &std::vector<Difference,std::allocator<Difference>>::emplace_back<size_t,std::string&,std::string&>(size_t &&,std::string &,std::string &)' being compiled
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(858,24):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<unsigned __int64,std::string&,std::string&>(unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Ty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(776,20):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<unsigned __int64,std::string&,std::string&>(unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Ty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(794,27):
+          see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64,std::string&,std::string&>(_Alloc &,_Objty *const ,unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<Difference>,
+              _Ty=Difference,
+              _Objty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(698,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Objty,unsigned __int64,std::string&,std::string&>(_Ty *const ,unsigned __int64 &&,std::string &,std::string &) noexcept(<expr>)' being compiled
+          with
+          [
+              _Ty=Difference,
+              _Objty=Difference
+          ]
+  
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(393,90): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'Source.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(393,90):
+      the template instantiation context (the oldest one first) is
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(794,27):
+          see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64,std::string&,std::string&>(_Alloc &,_Objty *const ,unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<Difference>,
+              _Ty=Difference,
+              _Objty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(698,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Objty,unsigned __int64,std::string&,std::string&>(_Ty *const ,unsigned __int64 &&,std::string &,std::string &) noexcept(false)' being compiled
+          with
+          [
+              _Ty=Difference,
+              _Objty=Difference
+          ]
+  
+  TextFileManager.vcxproj -> C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.exe
