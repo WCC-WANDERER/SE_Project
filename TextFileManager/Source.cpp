@@ -90,8 +90,8 @@ public:
 
         // Header
         std::cout << std::left << std::setw(10) << "Line"
-            << std::setw(70) << "First file Content"
-            << std::setw(70) << "Second file Content" << std::endl;
+            << std::setw(70) << "First file content"
+            << std::setw(70) << "Second file content" << std::endl;
 
         // Separator
         std::cout << std::string(150, '-') << std::endl;
