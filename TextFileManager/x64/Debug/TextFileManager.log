@@ -1,23 +1,41 @@
 ﻿  dLLExport.cpp
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(42,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(42,13):
+C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(82,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
+      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(82,13):
       The function is extern "C" and /EHc was specified
   
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(45,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(45,13):
+C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(85,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
+      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(85,13):
       The function is extern "C" and /EHc was specified
   
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(57,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(57,13):
+C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(97,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
+      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(97,13):
       The function is extern "C" and /EHc was specified
   
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(81,13): warning C4297: 'CompareFiles': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(81,13):
-      The function is extern "C" and /EHc was specified
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'dLLExport.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103):
+      the template instantiation context (the oldest one first) is
+          C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\FileManager.cpp(78,29):
+          see reference to function template instantiation 'Difference &std::vector<Difference,std::allocator<Difference>>::emplace_back<size_t,std::string&,std::string&>(size_t &&,std::string &,std::string &)' being compiled
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(858,24):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<unsigned __int64,std::string&,std::string&>(unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Ty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(776,20):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<unsigned __int64,std::string&,std::string&>(unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Ty=Difference
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(794,27):
+          see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64,std::string&,std::string&>(_Alloc &,_Objty *const ,unsigned __int64 &&,std::string &,std::string &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<Difference>,
+              _Ty=Difference,
+              _Objty=Difference
+          ]
   
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(102,13): warning C4297: 'CompareFiles': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(102,13):
-      The function is extern "C" and /EHc was specified
-  
-     Creating library C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.lib and object C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.exp
   TextFileManager.vcxproj -> C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.dll

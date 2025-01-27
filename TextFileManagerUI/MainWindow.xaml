@@ -22,41 +22,41 @@
 
         <!-- File Input Section -->
         <StackPanel Orientation="Horizontal" Margin="20" Grid.Row="0" HorizontalAlignment="Stretch">
-            <TextBlock Text="File 1:" FontSize="16" Height="30" VerticalAlignment="Center" Margin="0,5,10,0"/>
-            <TextBox x:Name="File1Path" FontSize="16" Width="300" Height="30" IsReadOnly="True" 
+            <TextBlock Text="File 1:" FontSize="14" Height="30" VerticalAlignment="Center" Margin="0,5,10,0"/>
+            <TextBox x:Name="File1Path" FontSize="14" Width="300" Height="30" IsReadOnly="True" 
                      Margin="0,0,10,0" VerticalContentAlignment="Center"/>
-            <Button Content="Browse" FontSize="14" Width="80" Height="30" Click="BrowseFile1_Click"/>
+            <Button Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile1_Click"/>
 
-            <TextBlock Text="File 2:" FontSize="16" Height="30" VerticalAlignment="Center" Margin="20,5,10,0"/>
-            <TextBox x:Name="File2Path" FontSize="16" Width="300" Height="30" IsReadOnly="True" 
+            <TextBlock Text="File 2:" FontSize="14" Height="30" VerticalAlignment="Center" Margin="20,5,10,0"/>
+            <TextBox x:Name="File2Path" FontSize="14" Width="300" Height="30" IsReadOnly="True" 
                      Margin="0,0,10,0" VerticalContentAlignment="Center"/>
-            <Button Content="Browse" FontSize="14" Width="80" Height="30" Click="BrowseFile2_Click"/>
+            <Button Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile2_Click"/>
         </StackPanel>
 
         <!-- Compare Files Button (Positioned Below File 1 Browse) -->
-        <Button Content="Compare Files" FontSize="16" Width="130" Height="50" Grid.Row="1" 
-                HorizontalAlignment="Left" Margin="20,5,0,15" Click="CompareFiles_Click"/>
+        <Button Content="Compare Files" FontSize="14" Width="130" Height="40" Grid.Row="1" 
+                HorizontalAlignment="Left" Margin="20,0,0,10" Click="CompareFiles_Click"/>
 
         <!-- Differences Table -->
         <ScrollViewer Grid.Row="2" Margin="20,10,20,10" VerticalScrollBarVisibility="Auto">
             <DataGrid x:Name="DifferencesGrid" AutoGenerateColumns="False" 
-                  HeadersVisibility="Column" SelectionMode="Single" RowHeight="25">
+                  HeadersVisibility="Column" SelectionMode="Single" RowHeight="20">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="FontSize" Value="16"/>
-                        <Setter Property="Height" Value="30"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Height" Value="25"/>
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
 
                 <DataGrid.Columns>
                     <!-- Line Number -->
-                    <DataGridTextColumn Header="Line Number" Binding="{Binding LineNumber}" Width="120"/>
+                    <DataGridTextColumn Header="Line Number" Binding="{Binding LineNumber}" Width="100"/>
 
                     <!-- Content from File 1 -->
                     <DataGridTemplateColumn Header="File 1" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding File1Content}" TextWrapping="Wrap" FontSize="16"/>
+                                <TextBlock Text="{Binding File1Content}" TextWrapping="Wrap" FontSize="12"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -74,20 +74,22 @@
                     <DataGridTemplateColumn Header="File 2" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding File2Content}" TextWrapping="Wrap" FontSize="16"/>
+                                <TextBlock Text="{Binding File2Content}" TextWrapping="Wrap" FontSize="12"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
                     <!-- Choice Selector -->
-                    <DataGridTemplateColumn Header="Choose" Width="150">
+                    <DataGridTemplateColumn Header="Choose" Width="130">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <RadioButton GroupName="{Binding LineNumber}" Content="File 1" IsChecked="{Binding UseFile1}" 
-                                         Margin="5,0" FontSize="14" VerticalContentAlignment="Center"/>
-                                    <RadioButton GroupName="{Binding LineNumber}" Content="File 2" IsChecked="{Binding UseFile2}" 
-                                         Margin="5,0" FontSize="14" VerticalContentAlignment="Center"/>
+                                    <RadioButton GroupName="{Binding LineNumber}" Content="File 1" 
+                                                 IsChecked="{Binding Path=UseFile1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Margin="5,0" FontSize="12" VerticalContentAlignment="Center"/>
+                                    <RadioButton GroupName="{Binding LineNumber}" Content="File 2" 
+                                                 IsChecked="{Binding Path=UseFile2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Margin="5,0" FontSize="12" VerticalContentAlignment="Center"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -99,24 +101,18 @@
         <!-- Output and Actions Section -->
         <StackPanel Orientation="Vertical" Grid.Row="3" Margin="20,10,20,10">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Output File Name:" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBox x:Name="OutputFileName" FontSize="16" Width="300" Height="30" Margin="0,0,20,0" VerticalContentAlignment="Center"/>
-                <TextBlock Text="Format:" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <ComboBox x:Name="OutputFormat" FontSize="14" Width="100" Height="30" VerticalContentAlignment="Center">
+                <TextBlock Text="Output File Name:" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox x:Name="OutputFileName" FontSize="14" Width="300" Height="30" Margin="0,0,20,0" VerticalContentAlignment="Center"/>
+                <TextBlock Text="Format:" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox x:Name="OutputFormat" FontSize="12" Width="100" Height="30" 
+                          VerticalContentAlignment="Center" Margin="0,0,100,0">
                     <ComboBoxItem Content=".txt" IsSelected="True"/>
-                    <ComboBoxItem Content=".doc"/>
+                    <ComboBoxItem Content=".docx"/>
                     <ComboBoxItem Content=".odt"/>
                 </ComboBox>
+                <Button x:Name="SaveOutputButton" Content="Save Output" FontSize="14" Width="150" Height="50" Click="SaveOutput_Click" IsEnabled="False" Margin="0,0,50,0"/>
+                <Button x:Name="ModifyFileButton" Content="Modify File" FontSize="14" Width="150" Height="50" Click="ModifyFile_Click" IsEnabled="False"/>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                <TextBlock Text="Save Location:" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBox x:Name="SaveLocation" FontSize="16" Width="300" Height="30" IsReadOnly="True" Margin="0,0,20,0" VerticalContentAlignment="Center"/>
-                <Button Content="Browse" FontSize="14" Width="80" Height="30" Click="BrowseSaveLocation_Click" Margin="0,0,280,0"/>
-                <Button Content="Save Output" FontSize="16" Width="150" Height="50" Click="SaveOutput_Click"/>
-            </StackPanel>
-       
         </StackPanel>
     </Grid>
-
 </Window>

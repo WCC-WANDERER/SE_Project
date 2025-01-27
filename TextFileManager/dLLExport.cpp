@@ -6,9 +6,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <cstdlib>
-//#include "Source.cpp"
-
-
+#include "FileManager.cpp"
 
 
 // Function to check if the file is already in .txt format
@@ -18,16 +16,56 @@ bool isTxtFile(const std::string& filePath) {
 }
 
 // Function to convert .doc, .docx, or .odt to .txt using LibreOffice's soffice command
-void convertToTxt(const std::string& inputFilePath, const std::string& outputFilePath) {
+std::string convertToTxt(const std::string& inputFilePath, const std::string& outputDir) {
 
-    std::string command = "soffice --headless --convert-to txt:Text " + inputFilePath + " --outdir " + outputFilePath;
+    // Convert input file path to absolute path
+    std::filesystem::path inputAbsPath = std::filesystem::absolute(inputFilePath);
+
+    // Convert outputDir to a std::filesystem::path
+    std::filesystem::path outputDirPath(outputDir);
+
+    // Extract the file name without extension
+    std::filesystem::path inputPath(inputAbsPath);
+    std::string outputFileName = inputPath.stem().string() + ".txt";
+
+    // Combine the output directory and the output file name
+    std::filesystem::path outputFilePath = outputDirPath / outputFileName;
+
+    // Construct the Pandoc command with --wrap=none
+    std::string command = "pandoc \"" + inputAbsPath.string() + "\" -o \"" + outputFilePath.string() + "\"";
+
+    // Execute the command
     int result = system(command.c_str());
+
+    // Check for errors during conversion
     if (result != 0) {
-        std::cerr << "Error converting file: " << inputFilePath << std::endl;
+        std::cerr << "Error converting file: " << inputAbsPath.string() << std::endl;
+        throw std::runtime_error("Failed to convert file: " + inputAbsPath.string());
     }
     else {
-        std::cout << "File successfully converted to: " << outputFilePath << std::endl;
+        std::cout << "File successfully converted to: " << outputFilePath.string() << std::endl;
     }
+
+    //// Post-process the output file to remove empty lines
+    //std::ifstream inputFile(outputFilePath.string());
+    //std::ofstream tempFile("temp_output.txt");
+
+    //std::string line;
+    //while (std::getline(inputFile, line)) {
+    //    if (!line.empty()) {  // Only write non-empty lines to the new file
+    //        tempFile << line << "\n";
+    //    }
+    //}
+
+    //inputFile.close();
+    //tempFile.close();
+
+    //// Replace the original output file with the cleaned file
+    //std::remove(outputFilePath.string().c_str());
+    //std::rename("temp_output.txt", outputFilePath.string().c_str());
+
+    // Return the output file path as a string
+    return outputFilePath.string();
 }
 
 
@@ -36,6 +74,8 @@ void convertToTxt(const std::string& inputFilePath, const std::string& outputFil
 extern "C" {
 
     __declspec(dllexport) void RetrieveContent(const char* path, char* buffer, int bufferSize) {
+
+        File firstFile(path);
 
         std::ifstream file(path);
         if (!file) {
@@ -61,72 +101,87 @@ extern "C" {
     }
 
 
-    __declspec(dllexport) int CompareFiles(const char* file1Path, const char* file2Path, char* resultBuffer, int bufferSize) {
+    __declspec(dllexport) int CompareFiles(const char* file1Path, const char* file2Path, char* resultBuffer, int resultBufferSize, 
+        char* file1ContentBuffer, int file1ContentBufferSize, char* file2ContentBuffer, int file2ContentBufferSize) {
 
-        // Check if the extension is .doc or .odt file, convert if necessary
-        std::string outputDir = std::filesystem::current_path().string();
-        std::string outputFilePath = outputDir + "converted.txt";
+        try {
 
-        if (!isTxtFile(file1Path)) {
+            // Check if the extension is .doc or .odt file, convert if necessary
+            std::string outputDir = std::filesystem::current_path().string();
 
-            convertToTxt(file1Path, outputDir);
-        }
-        if (!isTxtFile(file2Path)) {
+            bool test = true;
+            bool isFile1Converted = false;
+            bool isFile2Converted = false;
 
-            convertToTxt(file2Path, outputDir);
-        }
-
-        std::ifstream file1(file1Path), file2(file2Path);
-        if (!file1 || !file2) {
-            throw std::runtime_error("One or both files not found");
-        }
-
-        std::vector<std::string> file1Lines, file2Lines;
-        std::string line;
-        while (std::getline(file1, line)) file1Lines.push_back(line);
-        while (std::getline(file2, line)) file2Lines.push_back(line);
-
-        size_t maxLines = std::max(file1Lines.size(), file2Lines.size());
-        std::ostringstream diffStream;
-
-        for (size_t i = 0; i < maxLines; i++) {
-            std::string line1 = i < file1Lines.size() ? file1Lines[i] : "";
-            std::string line2 = i < file2Lines.size() ? file2Lines[i] : "";
-            if (line1 != line2) {
-                diffStream << "Line " << (i + 1) << ": File1 -> " << line1 << ", File2 -> " << line2 << "\n";
+            // Convert file1Path if not a .txt file
+            std::string file1ConvertedPath = file1Path;
+            if (!isTxtFile(file1ConvertedPath)) {
+                file1ConvertedPath = convertToTxt(file1ConvertedPath, outputDir);
+                isFile1Converted = true;
             }
-        }
 
-        std::string differences = diffStream.str();
-        if (differences.size() >= bufferSize) {
-            throw std::runtime_error("Buffer size too small");
-        }
-        std::copy(differences.begin(), differences.end(), resultBuffer);
-        resultBuffer[differences.size()] = '\0';
+            // Convert file2Path if not a .txt file
+            std::string file2ConvertedPath = file2Path;
+            if (!isTxtFile(file2ConvertedPath)) {
+                file2ConvertedPath = convertToTxt(file2ConvertedPath, outputDir);
+                isFile2Converted = true;
+            }
 
-        return 0; // Success
+            File firstFile(file1ConvertedPath);
+            File secondFile(file2ConvertedPath);
+
+            std::vector<std::string> firstFileContent = firstFile.retrieveContent();
+            std::vector<std::string> secondFileContent = secondFile.retrieveContent();
+
+            // Prepare original content buffers (full content of both files)
+            std::ostringstream originalContentStream;
+            for (const auto& line : firstFileContent) {
+                originalContentStream << line << "\n";
+            }
+            std::ostringstream secondOriginalContentStream;
+            for (const auto& line : secondFileContent) {
+                secondOriginalContentStream << line << "\n";
+            }
+
+            std::string originalContentString = originalContentStream.str();
+            std::string secondOriginalContentString = secondOriginalContentStream.str();
+
+            // Ensure buffer sizes are large enough
+            if (originalContentString.size() >= file1ContentBufferSize || secondOriginalContentString.size() >= file2ContentBufferSize) {
+                throw std::runtime_error("Buffer size too small");
+            }
+
+            // Copy the full original content to the buffers
+            std::copy(originalContentString.begin(), originalContentString.end(), file1ContentBuffer);
+            std::copy(secondOriginalContentString.begin(), secondOriginalContentString.end(), file2ContentBuffer);
+            file1ContentBuffer[originalContentString.size()] = '\0';
+            file2ContentBuffer[secondOriginalContentString.size()] = '\0';
+
+            Comparator comparator;
+            std::vector<Difference> differences = comparator.compareFiles(firstFileContent, secondFileContent);
+
+            // Build the string of differences
+            std::ostringstream diffStream;
+            for (const auto& diff : differences) {
+                diffStream << "Line " << diff.getLineNumber() << ": File1 -> " << diff.getFirstFileContent()
+                    << ", File2 -> " << diff.getSecondFileContent() << "\n";
+            }
+
+            std::string diffString = diffStream.str();
+            if (diffString.size() >= resultBufferSize) {
+                throw std::runtime_error("Buffer size too small");
+            }
+            std::copy(diffString.begin(), diffString.end(), resultBuffer);
+            resultBuffer[diffString.size()] = '\0';
+
+            return 0; // Success
+
+        }
+        catch (const std::exception& ex) {
+            std::cerr << "Exception in CompareFiles: " << ex.what() << std::endl;
+            return -1;  // Indicate failure
+        }
     }
 }
 
 
-
-
-
-
-
-//// Function to process the converted .txt file line by line
-//void processTxtFile(const std::string& txtFilePath) {
-//    std::ifstream file(txtFilePath);
-//    if (!file.is_open()) {
-//        std::cerr << "Error opening file: " << txtFilePath << std::endl;
-//        return;
-//    }
-//
-//    std::string line;
-//    while (std::getline(file, line)) {
-//        // Process each line (e.g., display it, modify it, etc.)
-//        std::cout << "Processing: " << line << std::endl;
-//    }
-//
-//    file.close();
-//}
