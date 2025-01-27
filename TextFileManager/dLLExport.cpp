@@ -32,7 +32,7 @@ std::string convertToTxt(const std::string& inputFilePath, const std::string& ou
     std::filesystem::path outputFilePath = outputDirPath / outputFileName;
 
     // Construct the Pandoc command with --wrap=none
-    std::string command = "pandoc \"" + inputAbsPath.string() + "\" -o \"" + outputFilePath.string() + "\"";
+    std::string command = "pandoc --to=plain+smart --wrap=none \"" + inputAbsPath.string() + "\" -o \"" + outputFilePath.string() + "\"";
 
     // Execute the command
     int result = system(command.c_str());

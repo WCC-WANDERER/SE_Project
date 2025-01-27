@@ -24,7 +24,7 @@ public:
         std::ifstream file(path);
         if (!file)
             throw std::runtime_error("File not found: " + path);
-        
+
         // FR.11
         if (file.peek() == std::ifstream::traits_type::eof()) {
             throw std::runtime_error("Error: The file \"" + path + "\" is empty.");
@@ -33,8 +33,12 @@ public:
         std::vector<std::string> lines;
         std::string line;
         while (std::getline(file, line)) {
-            lines.push_back(line);
+            // Trim whitespace and check if the line is empty
+            if (!line.empty()) {
+                lines.push_back(line);
+            }
         }
+
         file.close();
         return lines;
     }

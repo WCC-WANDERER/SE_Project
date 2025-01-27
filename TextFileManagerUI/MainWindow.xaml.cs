@@ -205,15 +205,19 @@ namespace TextFileManagerUI
                 return;
             }
 
-            // Check for Pandoc installation
-            if (!IsPandocInstalled())
+            // Check if either file is not a .txt file
+            if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt" || System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
             {
-                MessageBox.Show(
-                    "Pandoc is not installed on this system. Please install Pandoc to enable file conversion from .docx or .odt to .txt.",
-                    "Missing Dependency",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
+                //Check for Pandoc installation
+                if (!IsPandocInstalled())
+                {
+                    MessageBox.Show(
+                        "Pandoc is not installed on this system. Please install Pandoc to enable file conversion from .docx or .odt to .txt.",
+                        "Missing Dependency",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
             }
 
             try
@@ -283,39 +287,41 @@ namespace TextFileManagerUI
                     MessageBox.Show("Error occurred during file comparison.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
-                //// Check the extension of the files and delete the temporary .txt files if necessary
-                //if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
-                //{
-                //    // Remove extension from file1Path and add .txt
-                //    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
-                //    if (File.Exists(tempFile1Path))
-                //    {
-                //        try
-                //        {
-                //            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                //        }
-                //    }
-                //}
-                //if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
-                //{
-                //    // Remove extension from file2Path and add .txt
-                //    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
-                //    if (File.Exists(tempFile2Path))
-                //    {
-                //        try
-                //        {
-                //            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                //        }
-                //    }
-                //}
+                // Check the extension of the files and delete the temporary .txt files if necessary
+                if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
+                {
+                    // Remove extension from file1Path and add .txt
+                    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
+                    if (File.Exists(tempFile1Path))
+                    {
+                        try
+                        {
+                            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
+                            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
+                {
+                    // Remove extension from file2Path and add .txt
+                    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
+                    if (File.Exists(tempFile2Path))
+                    {
+                        try
+                        {
+                            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
+                            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

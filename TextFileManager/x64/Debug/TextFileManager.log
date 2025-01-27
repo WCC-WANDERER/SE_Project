@@ -15,7 +15,7 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.3443
   (compiling source file 'dLLExport.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103):
       the template instantiation context (the oldest one first) is
-          C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\FileManager.cpp(78,29):
+          C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\FileManager.cpp(82,29):
           see reference to function template instantiation 'Difference &std::vector<Difference,std::allocator<Difference>>::emplace_back<size_t,std::string&,std::string&>(size_t &&,std::string &,std::string &)' being compiled
           C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(858,24):
           see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<unsigned __int64,std::string&,std::string&>(unsigned __int64 &&,std::string &,std::string &)' being compiled
@@ -38,4 +38,5 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.3443
               _Objty=Difference
           ]
   
+     Creating library C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.lib and object C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.exp
   TextFileManager.vcxproj -> C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.dll
