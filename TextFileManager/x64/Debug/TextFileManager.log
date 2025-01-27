@@ -1,16 +1,4 @@
 ﻿  dLLExport.cpp
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(82,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(82,13):
-      The function is extern "C" and /EHc was specified
-  
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(85,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(85,13):
-      The function is extern "C" and /EHc was specified
-  
-C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(97,13): warning C4297: 'RetrieveContent': function assumed not to throw an exception but does
-      C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\TextFileManager\dLLExport.cpp(97,13):
-      The function is extern "C" and /EHc was specified
-  
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   (compiling source file 'dLLExport.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103):
@@ -38,5 +26,4 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.3443
               _Objty=Difference
           ]
   
-     Creating library C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.lib and object C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.exp
   TextFileManager.vcxproj -> C:\Users\cccsk\OneDrive\Desktop\SE Project\SE_Project\x64\Debug\TextFileManager.dll

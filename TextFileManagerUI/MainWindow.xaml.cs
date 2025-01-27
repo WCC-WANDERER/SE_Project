@@ -26,13 +26,16 @@ namespace TextFileManagerUI
         public const string TextFileManagerDLL = @"..\..\..\..\x64\Debug\TextFileManager.dll";
 
         [DllImport(TextFileManagerDLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern void RetrieveContent(string path, [Out] char[] buffer, int bufferSize);
+        private static extern FileComparisonResult CompareFiles(string file1Path, string file2Path);
 
-        [DllImport(TextFileManagerDLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern int CompareFiles(string file1Path, string file2Path, [Out] char[] resultBuffer, int resultBufferSize, 
-            [Out] char[] file1ContentBuffer, int file1ContentBufferSize, [Out] char[] file2ContentBuffer, int file2ContentbBufferSize);
+        // Free the allocated memory for the result string (called after using it)
+        [DllImport(TextFileManagerDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void FreeMemory(IntPtr ptr);
 
+        // Disable save output button by default
         private bool isComparisonDone = false;
+
+        // Storing first and second file content and its path
         private string firstFileContent;
         private string secondFileContent;
         private string lastSavedFilePath = string.Empty;  // Variable to store the path of the last saved file
@@ -93,81 +96,6 @@ namespace TextFileManagerUI
             }
         }
 
-        // Event handler for Browse Save Location
-        //private void BrowseSaveLocation_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Get the selected output format from the ComboBox
-        //    string selectedFormat = OutputFormat.SelectedItem is ComboBoxItem selectedItem ? selectedItem.Content.ToString() : ".txt";
-
-        //    Set the correct filter based on the selected format
-        //    string filter = selectedFormat switch
-        //    {
-        //        ".doc" => "Word Documents|*.doc",
-        //        ".odt" => "OpenDocument Text|*.odt",
-        //        _ => "Text Files|*.txt"
-        //    };
-
-        //    SaveFileDialog saveFileDialog = new SaveFileDialog
-        //    {
-        //        Filter = filter,
-        //        Title = "Save Output File",
-        //        DefaultExt = selectedFormat,
-        //        FileName = OutputFileName.Text + selectedFormat // Set the default file name with the correct format
-        //    };
-
-        //    if (saveFileDialog.ShowDialog() == true)
-        //    {
-        //        Set the file path to the selected save location
-        //        SaveLocation.Text = saveFileDialog.FileName;
-
-        //        Update OutputFileName text with the name from the save file dialog(without the path)
-        //        OutputFileName.Text = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-        //    }
-        //}
-
-        // Method to check if LibreOffice is installed
-        //private bool IsLibreOfficeInstalled()
-        //{
-        //    // Check if `soffice` is available in PATH
-        //    var processStartInfo = new ProcessStartInfo
-        //    {
-        //        FileName = "soffice",
-        //        UseShellExecute = false,
-        //        RedirectStandardOutput = true,
-        //        RedirectStandardError = true,
-        //        CreateNoWindow = true
-        //    };
-
-        //    try
-        //    {
-        //        using (var process = Process.Start(processStartInfo))
-        //        {
-        //            process.WaitForExit();
-        //            return true;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        // Check common LibreOffice installation directories
-        //        string[] commonPaths =
-        //        {
-        //            @"C:\Program Files\LibreOffice\program\soffice.exe",
-        //            @"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
-        //            @"/usr/bin/soffice",   // Linux
-        //            @"/usr/local/bin/soffice", // macOS
-        //        };
-
-        //        foreach (var path in commonPaths)
-        //        {
-        //            if (File.Exists(path))
-        //                return true;
-        //        }
-        //    }
-
-        //    // LibreOffice not found
-        //    return false;
-        //}
-
         // Method to check if Pandoc is installed
         private bool IsPandocInstalled()
         {
@@ -208,6 +136,18 @@ namespace TextFileManagerUI
             // Check if either file is not a .txt file
             if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt" || System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
             {
+                // Check if the file formats are supported
+                if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt" && System.IO.Path.GetExtension(file1Path).ToLower() != ".docx" && System.IO.Path.GetExtension(file1Path).ToLower() != ".odt")
+                {
+                    MessageBox.Show("File 1 is not a valid file.\nThe following file formats are supported: .txt, .docx, .odt", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt" && System.IO.Path.GetExtension(file2Path).ToLower() != ".docx" && System.IO.Path.GetExtension(file2Path).ToLower() != ".odt")
+                {
+                    MessageBox.Show("File 2 is not a valid file.\nThe following file formats are supported: .txt, .docx, .odt", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 //Check for Pandoc installation
                 if (!IsPandocInstalled())
                 {
@@ -222,70 +162,49 @@ namespace TextFileManagerUI
 
             try
             {
-                // Allocate buffers for original content and differences
-                char[] firstFileContentBuffer = new char[10240]; // Adjust size as needed
-                char[] secondFileContentBuffer = new char[10240]; // Adjust size as needed
-                char[] resultBuffer = new char[10240]; // For differences
+                // Call the function
+                FileComparisonResult result = CompareFiles(file1Path, file2Path);
 
-                // Call the C++ function to compare files and get content and differences
-                int result = CompareFiles(file1Path, file2Path, resultBuffer, resultBuffer.Length, 
-                    firstFileContentBuffer, firstFileContentBuffer.Length, secondFileContentBuffer, secondFileContentBuffer.Length);
-                if (result == 0)
+                // Use the content and differences as needed
+                firstFileContent = Marshal.PtrToStringAnsi(result.file1ReturnContent);
+                secondFileContent = Marshal.PtrToStringAnsi(result.file2ReturnContent);
+                string differences = Marshal.PtrToStringAnsi(result.differences);
+
+                // Free the allocated memory in C++
+                FreeMemory(result.file1ReturnContent);
+                FreeMemory(result.file2ReturnContent);
+                FreeMemory(result.differences);
+
+                // Parse the differences and update the ObservableCollection
+                Differences.Clear();
+                string[] diffLines = differences.Split('\n');
+                foreach (string line in diffLines)
                 {
-                    // Retrieve original content and differences from buffers
-                    firstFileContent = new string(firstFileContentBuffer).TrimEnd('\0');
-                    secondFileContent = new string(secondFileContentBuffer).TrimEnd('\0');
-
-                    // Check if either file is empty
-                    if (string.IsNullOrWhiteSpace(firstFileContent))
+                    if (!string.IsNullOrEmpty(line))
                     {
-                        MessageBox.Show("File 1 is empty.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
-                    if (string.IsNullOrWhiteSpace(secondFileContent))
-                    {
-                        MessageBox.Show("File 2 is empty.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
-                    string differences = new string(resultBuffer).TrimEnd('\0');
-
-                    // Parse the differences and update the ObservableCollection
-                    Differences.Clear();
-                    string[] diffLines = differences.Split('\n');
-                    foreach (string line in diffLines)
-                    {
-                        if (!string.IsNullOrEmpty(line))
+                        var parts = line.Split(new[] { ": File1 -> ", ", File2 -> " }, StringSplitOptions.None);
+                        if (parts.Length == 3)
                         {
-                            var parts = line.Split(new[] { ": File1 -> ", ", File2 -> " }, StringSplitOptions.None);
-                            if (parts.Length == 3)
+                            Differences.Add(new LineDifference
                             {
-                                Differences.Add(new LineDifference
-                                {
-                                    LineNumber = int.Parse(parts[0].Replace("Line", "").Trim()),
-                                    File1Content = parts[1].Trim(),
-                                    File2Content = parts[2].Trim(),
-                                    UseFile1 = true,  // Default selection
-                                    UseFile2 = false
-                                });
-                            }
+                                LineNumber = int.Parse(parts[0].Replace("Line", "").Trim()),
+                                File1Content = parts[1].Trim(),
+                                File2Content = parts[2].Trim(),
+                                UseFile1 = true,  // Default selection
+                                UseFile2 = false
+                            });
                         }
                     }
-
-                    // Set the flag to true after comparison is done
-                    isComparisonDone = true;
-
-                    // Enable the "Save Output" button
-                    SaveOutputButton.IsEnabled = true;  // Make sure SaveOutputButton is the correct reference to your button
-                    ModifyFileButton.IsEnabled = true;
-
-                    MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-                else
-                {
-                    MessageBox.Show("Error occurred during file comparison.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+
+                // Set the flag to true after comparison is done
+                isComparisonDone = true;
+
+                // Enable the "Save Output" and "Modify File" buttons
+                SaveOutputButton.IsEnabled = true;
+                ModifyFileButton.IsEnabled = true;
+                MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
 
                 // Check the extension of the files and delete the temporary .txt files if necessary
                 if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
@@ -407,6 +326,7 @@ namespace TextFileManagerUI
             }
         }
 
+        // Event handler for Modify the Output File
         private void ModifyFile_Click(object sender, RoutedEventArgs e)
         {
             if (!isComparisonDone)
@@ -491,6 +411,15 @@ namespace TextFileManagerUI
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FileComparisonResult
+        {
+            public IntPtr file1ReturnContent;
+            public IntPtr file2ReturnContent;
+            public IntPtr differences;
+        }
+
     }
 
 }

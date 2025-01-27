@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TextFileManagerUI"
         mc:Ignorable="d"
-        Title="Text File Manager" Height="750" Width="1200">
+        Title="Text File Manager" Height="700" Width="1200">
 
     <Grid>
         <!-- Main Layout with Rows and Columns -->
