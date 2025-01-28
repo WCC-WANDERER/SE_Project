@@ -206,41 +206,41 @@ namespace TextFileManagerUI
                 MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
 
-                // Check the extension of the files and delete the temporary .txt files if necessary
-                if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
-                {
-                    // Remove extension from file1Path and add .txt
-                    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
-                    if (File.Exists(tempFile1Path))
-                    {
-                        try
-                        {
-                            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
-                            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-                if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
-                {
-                    // Remove extension from file2Path and add .txt
-                    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
-                    if (File.Exists(tempFile2Path))
-                    {
-                        try
-                        {
-                            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
-                            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
+                //// Check the extension of the files and delete the temporary .txt files if necessary
+                //if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
+                //{
+                //    // Remove extension from file1Path and add .txt
+                //    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
+                //    if (File.Exists(tempFile1Path))
+                //    {
+                //        try
+                //        {
+                //            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
+                //            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                //        }
+                //    }
+                //}
+                //if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
+                //{
+                //    // Remove extension from file2Path and add .txt
+                //    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
+                //    if (File.Exists(tempFile2Path))
+                //    {
+                //        try
+                //        {
+                //            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
+                //            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {

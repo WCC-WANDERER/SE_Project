@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <filesystem>
 
 
@@ -42,6 +43,11 @@ public:
         file.close();
         return lines;
     }
+
+    std::string getPath() { return path; }
+    std::string getName() { return name; }
+    std::string getExtension() { return format; }
+
 };
 
 // Represents a difference between two files
@@ -70,44 +76,100 @@ class Comparator {
     std::vector<Difference> differences;
 
 public:
-    std::vector<Difference> compareFiles(const std::vector<std::string>& firstFileContent, const std::vector<std::string>& secondFileContent) {
+
+    void compareFiles(const std::string file1Path, const std::string file2Path, std::string& file1Str, std::string& file2Str) {
+
+        // Open files
+        std::ifstream file1(file1Path);
+        std::ifstream file2(file2Path);
+        if (!file1) throw std::runtime_error("File not found: " + file1Path);
+        if (!file2) throw std::runtime_error("File not found: " + file2Path);
+
+        //Prepare content buffers and differences
+        std::ostringstream file1Content, file2Content;
         //std::vector<Difference> differences;
-        size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
+        differences.clear();
+        std::string line1, line2;
+        int lineNumber = 0;
 
-        for (size_t i = 0; i < maxLines; i++) {
-            std::string firstFileLine = i < firstFileContent.size() ? firstFileContent[i] : "";
-            std::string secondFileLine = i < secondFileContent.size() ? secondFileContent[i] : "";
+        while (true)
+        {
+            //std::string line1, line2;
+            bool gotLine1 = static_cast<bool>(std::getline(file1, line1));
+            bool gotLine2 = static_cast<bool>(std::getline(file2, line2));
+            lineNumber++;
 
-            if (firstFileLine != secondFileLine) {
-                differences.emplace_back(i + 1, firstFileLine, secondFileLine);
+            if (!gotLine1 && !gotLine2)
+            {
+                break;
             }
+
+            std::string currentLine1 = gotLine1 ? line1 : "";
+            std::string currentLine2 = gotLine2 ? line2 : "";
+
+            //Compare and store
+            if (currentLine1 != currentLine2) {
+                differences.emplace_back(lineNumber, currentLine1, currentLine2);
+            }
+
+            if (gotLine1) file1Content << line1 << "\n";
+            if (gotLine2) file2Content << line2 << "\n";
         }
-        return differences;
+
+        // Close the files
+        file1.close();
+        file2.close();
+
+        file1Str = file1Content.str();
+        file2Str = file2Content.str();
+
     }
 
-    // FR.3; Temporary one for console application
-    void showDifferences() { 
 
-        // Title
-        std::cout << std::endl;
-        std::cout << "List of differences\n" << std::endl;
+    std::vector<Difference> getDifferences() { return differences; }
 
-        // Header
-        std::cout << std::left << std::setw(10) << "Line"
-            << std::setw(70) << "First file content"
-            << std::setw(70) << "Second file content" << std::endl;
 
-        // Separator
-        std::cout << std::string(150, '-') << std::endl;
 
-        // Print each difference
-        for (const auto& diff : differences) {
-            std::cout << std::left << std::setw(10) << diff.getLineNumber()
-                << std::setw(70) << diff.getFirstFileContent()
-                << std::setw(70) << diff.getSecondFileContent() << std::endl;
-        }
-        std::cout << std::endl;
-    }
+    
+    //std::vector<Difference> compareFiles(const std::vector<std::string>& firstFileContent, const std::vector<std::string>& secondFileContent) {
+    //    //std::vector<Difference> differences;
+    //    size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
+
+    //    for (size_t i = 0; i < maxLines; i++) {
+    //        std::string firstFileLine = i < firstFileContent.size() ? firstFileContent[i] : "";
+    //        std::string secondFileLine = i < secondFileContent.size() ? secondFileContent[i] : "";
+
+    //        if (firstFileLine != secondFileLine) {
+    //            differences.emplace_back(i + 1, firstFileLine, secondFileLine);
+    //        }
+    //    }
+    //    return differences;
+    //}
+    //
+
+    //// FR.3; Temporary one for console application
+    //void showDifferences() { 
+
+    //    // Title
+    //    std::cout << std::endl;
+    //    std::cout << "List of differences\n" << std::endl;
+
+    //    // Header
+    //    std::cout << std::left << std::setw(10) << "Line"
+    //        << std::setw(70) << "First file content"
+    //        << std::setw(70) << "Second file content" << std::endl;
+
+    //    // Separator
+    //    std::cout << std::string(150, '-') << std::endl;
+
+    //    // Print each difference
+    //    for (const auto& diff : differences) {
+    //        std::cout << std::left << std::setw(10) << diff.getLineNumber()
+    //            << std::setw(70) << diff.getFirstFileContent()
+    //            << std::setw(70) << diff.getSecondFileContent() << std::endl;
+    //    }
+    //    std::cout << std::endl;
+    //}
 };
 
 // Handles merging of two files
@@ -119,33 +181,33 @@ public:
         const std::vector<Difference>& differences) {
         std::vector<std::string> mergedContent;
 
-        size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
-        size_t diffIndex = 0;
+        ////size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
+        //size_t diffIndex = 0;
 
-        for (size_t i = 0; i < maxLines; i++) {
-            if (diffIndex < differences.size() && i + 1 == differences[diffIndex].getLineNumber()) {
-                std::cout << "Line " << (i + 1) << " differs:\n";
-                std::cout << "1: " << differences[diffIndex].getFirstFileContent() << "\n";
-                std::cout << "2: " << differences[diffIndex].getSecondFileContent() << "\n";
-                std::cout << "Choose which line to save (1/2): ";
+        //for (size_t i = 0; i < maxLines; i++) {
+        //    if (diffIndex < differences.size() && i + 1 == differences[diffIndex].getLineNumber()) {
+        //        std::cout << "Line " << (i + 1) << " differs:\n";
+        //        std::cout << "1: " << differences[diffIndex].getFirstFileContent() << "\n";
+        //        std::cout << "2: " << differences[diffIndex].getSecondFileContent() << "\n";
+        //        std::cout << "Choose which line to save (1/2): ";
 
-                // FR.5
-                std::string choice;
-                std::cin >> choice;
-                while (choice != "1" && choice != "2") {
-                    std::cout << "Invalid choice. Please enter 1 or 2: ";
-                    std::cin >> choice;
-                }
+        //        // FR.5
+        //        std::string choice;
+        //        std::cin >> choice;
+        //        while (choice != "1" && choice != "2") {
+        //            std::cout << "Invalid choice. Please enter 1 or 2: ";
+        //            std::cin >> choice;
+        //        }
 
-                mergedContent.push_back(choice == "1" ? differences[diffIndex].getFirstFileContent() : differences[diffIndex].getSecondFileContent());
-                diffIndex++;
-            }
-            else {
-                // To be improved, should be based on the user's choice but not based on file size
-                std::string line = (firstFileContent.size() > secondFileContent.size()) ? firstFileContent[i] : secondFileContent[i];
-                mergedContent.push_back(line);
-            }
-        }
+        //        mergedContent.push_back(choice == "1" ? differences[diffIndex].getFirstFileContent() : differences[diffIndex].getSecondFileContent());
+        //        diffIndex++;
+        //    }
+        //    else {
+        //        // To be improved, should be based on the user's choice but not based on file size
+        //        std::string line = (firstFileContent.size() > secondFileContent.size()) ? firstFileContent[i] : secondFileContent[i];
+        //        mergedContent.push_back(line);
+        //    }
+        //}
         return mergedContent;
     }
 };
