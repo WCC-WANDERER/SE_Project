@@ -3,9 +3,107 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <filesystem>
+#include <sstream>
+#include <stdexcept>
+#include <cstdlib>
+#include <windows.h>
 
+//// Function to delete temporary files by setting attributes to normal
+//void deleteTemporaryFile(const std::string& outputFilePath) {
+//
+//    // Set file attributes to normal (if it exists)
+//    if (std::filesystem::exists(outputFilePath)) {
+//        if (!SetFileAttributes(std::filesystem::path(outputFilePath).c_str(), FILE_ATTRIBUTE_NORMAL)) {
+//            DWORD error = GetLastError();
+//            std::cerr << "Failed to set file attributes to normal for: " << outputFilePath
+//                << ". Error Code: " << error << std::endl;
+//        }
+//
+//        // Delete the original file
+//        try {
+//            std::filesystem::remove(outputFilePath);
+//        }
+//        catch (const std::exception& ex) {
+//            std::cerr << "Error deleting file: " << ex.what() << std::endl;
+//            return;
+//        }
+//    }
+//    else {
+//        std::cerr << "File does not exist: " << outputFilePath << std::endl;
+//        return;
+//    }
+//}
+//
+//// Function to convert .doc, .docx, or .odt to .txt using LibreOffice's soffice command
+//std::string convertToTxt(const std::string& inputFilePath, const std::string& outputDir) {
+//
+//    // Convert input file path to absolute path
+//    std::filesystem::path inputAbsPath = std::filesystem::absolute(inputFilePath);
+//
+//    // Convert outputDir to a std::filesystem::path
+//    std::filesystem::path outputDirPath(outputDir);
+//
+//    // Extract the file name without extension
+//    std::filesystem::path inputPath(inputAbsPath);
+//    std::string outputFileName = inputPath.stem().string() + ".txt";
+//
+//    // Combine the output directory and the output file name
+//    std::filesystem::path outputFilePath = outputDirPath / outputFileName;
+//
+//    // Construct the Pandoc command with --wrap=none
+//    std::string command = "pandoc --to=plain+smart --wrap=none \"" + inputAbsPath.string() + "\" -o \"" + outputFilePath.string() + "\"";
+//
+//    // Execute the command
+//    int result = system(command.c_str());
+//
+//    // Check for errors during conversion
+//    if (result != 0) {
+//        std::cerr << "Error converting file: " << inputAbsPath.string() << std::endl;
+//        throw std::runtime_error("Failed to convert file: " + inputAbsPath.string());
+//    }
+//    else {
+//        std::cout << "File successfully converted to: " << outputFilePath.string() << std::endl;
+//    }
+//
+//    // Temporary file for cleaned content
+//    const std::string tempFilePath = "temp_output.txt";
+//
+//    // Open the original output file and the temporary file
+//    std::ifstream inputFile(outputFilePath);
+//    std::ofstream tempFile(tempFilePath);
+//
+//    if (!inputFile.is_open() || !tempFile.is_open()) {
+//        std::cerr << "Error: Unable to open files for processing." << std::endl;
+//        throw std::runtime_error("File not found: " + outputFilePath.string() + " or " + tempFilePath);
+//    }
+//
+//    // Remove empty lines from the file
+//    std::string line;
+//    while (std::getline(inputFile, line)) {
+//        if (!line.empty()) {  // Only write non-empty lines
+//            tempFile << line << "\n";
+//        }
+//    }
+//
+//    // Close the files
+//    inputFile.close();
+//    tempFile.close();
+//
+//    deleteTemporaryFile(outputFilePath.string());
+//
+//    // Rename the temporary file to the original file name
+//    try {
+//        std::filesystem::rename(tempFilePath, outputFilePath);
+//    }
+//    catch (const std::exception& ex) {
+//        std::cerr << "Error renaming temporary file: " << ex.what() << std::endl;
+//    }
+//
+//    // Return the output file path as a string
+//    return outputFilePath.string();
+//
+//}
 
 // Represents a file in the system
 class File {
@@ -21,7 +119,103 @@ public:
         this->format = std::filesystem::path(path).extension().string();
     }
 
-    std::vector<std::string> retrieveContent() {
+    // Function to delete temporary files by setting attributes to normal
+    void deleteTemporaryFile(const std::string& outputFilePath) {
+
+        // Set file attributes to normal (if it exists)
+        if (std::filesystem::exists(outputFilePath)) {
+            if (!SetFileAttributes(std::filesystem::path(outputFilePath).c_str(), FILE_ATTRIBUTE_NORMAL)) {
+                DWORD error = GetLastError();
+                std::cerr << "Failed to set file attributes to normal for: " << outputFilePath
+                    << ". Error Code: " << error << std::endl;
+            }
+
+            // Delete the original file
+            try {
+                std::filesystem::remove(outputFilePath);
+            }
+            catch (const std::exception& ex) {
+                std::cerr << "Error deleting file: " << ex.what() << std::endl;
+                return;
+            }
+        }
+        else {
+            std::cerr << "File does not exist: " << outputFilePath << std::endl;
+            return;
+        }
+    }
+
+    // Function to convert .docx, or .odt to .txt using Pandoc's command
+    std::string convertToTxt(const std::string& inputFilePath, const std::string& outputDir) {
+
+        // Convert input file path to absolute path
+        std::filesystem::path inputAbsPath = std::filesystem::absolute(inputFilePath);
+
+        // Convert outputDir to a std::filesystem::path
+        std::filesystem::path outputDirPath(outputDir);
+
+        // Extract the file name without extension
+        std::filesystem::path inputPath(inputAbsPath);
+        std::string outputFileName = inputPath.stem().string() + ".txt";
+
+        // Combine the output directory and the output file name
+        std::filesystem::path outputFilePath = outputDirPath / outputFileName;
+
+        // Construct the Pandoc command with --wrap=none
+        std::string command = "pandoc --to=plain+smart --wrap=none \"" + inputAbsPath.string() + "\" -o \"" + outputFilePath.string() + "\"";
+
+        // Execute the command
+        int result = system(command.c_str());
+
+        // Check for errors during conversion
+        if (result != 0) {
+            std::cerr << "Error converting file: " << inputAbsPath.string() << std::endl;
+            throw std::runtime_error("Failed to convert file: " + inputAbsPath.string());
+        }
+        else {
+            std::cout << "File successfully converted to: " << outputFilePath.string() << std::endl;
+        }
+
+        // Temporary file for cleaned content
+        const std::string tempFilePath = "temp_output.txt";
+
+        // Open the original output file and the temporary file
+        std::ifstream inputFile(outputFilePath);
+        std::ofstream tempFile(tempFilePath);
+
+        if (!inputFile.is_open() || !tempFile.is_open()) {
+            std::cerr << "Error: Unable to open files for processing." << std::endl;
+            throw std::runtime_error("File not found: " + outputFilePath.string() + " or " + tempFilePath);
+        }
+
+        // Remove empty lines from the file
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            if (!line.empty()) {  // Only write non-empty lines
+                tempFile << line << "\n";
+            }
+        }
+
+        // Close the files
+        inputFile.close();
+        tempFile.close();
+
+        deleteTemporaryFile(outputFilePath.string());
+
+        // Rename the temporary file to the original file name
+        try {
+            std::filesystem::rename(tempFilePath, outputFilePath);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << "Error renaming temporary file: " << ex.what() << std::endl;
+        }
+
+        // Return the output file path as a string
+        return outputFilePath.string();
+
+    }
+
+    /*std::vector<std::string> retrieveContent() {
         std::ifstream file(path);
         if (!file)
             throw std::runtime_error("File not found: " + path);
@@ -42,7 +236,7 @@ public:
 
         file.close();
         return lines;
-    }
+    }*/
 
     std::string getPath() { return path; }
     std::string getName() { return name; }
@@ -77,7 +271,7 @@ class Comparator {
 
 public:
 
-    void compareFiles(const std::string file1Path, const std::string file2Path, std::string& file1Str, std::string& file2Str) {
+    void compareFilesContent(const std::string file1Path, const std::string file2Path, std::string& file1Str, std::string& file2Str) {
 
         // Open files
         std::ifstream file1(file1Path);
@@ -87,7 +281,6 @@ public:
 
         //Prepare content buffers and differences
         std::ostringstream file1Content, file2Content;
-        //std::vector<Difference> differences;
         differences.clear();
         std::string line1, line2;
         int lineNumber = 0;
@@ -125,178 +318,134 @@ public:
 
     }
 
-
     std::vector<Difference> getDifferences() { return differences; }
-
-
-
-    
-    //std::vector<Difference> compareFiles(const std::vector<std::string>& firstFileContent, const std::vector<std::string>& secondFileContent) {
-    //    //std::vector<Difference> differences;
-    //    size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
-
-    //    for (size_t i = 0; i < maxLines; i++) {
-    //        std::string firstFileLine = i < firstFileContent.size() ? firstFileContent[i] : "";
-    //        std::string secondFileLine = i < secondFileContent.size() ? secondFileContent[i] : "";
-
-    //        if (firstFileLine != secondFileLine) {
-    //            differences.emplace_back(i + 1, firstFileLine, secondFileLine);
-    //        }
-    //    }
-    //    return differences;
-    //}
-    //
-
-    //// FR.3; Temporary one for console application
-    //void showDifferences() { 
-
-    //    // Title
-    //    std::cout << std::endl;
-    //    std::cout << "List of differences\n" << std::endl;
-
-    //    // Header
-    //    std::cout << std::left << std::setw(10) << "Line"
-    //        << std::setw(70) << "First file content"
-    //        << std::setw(70) << "Second file content" << std::endl;
-
-    //    // Separator
-    //    std::cout << std::string(150, '-') << std::endl;
-
-    //    // Print each difference
-    //    for (const auto& diff : differences) {
-    //        std::cout << std::left << std::setw(10) << diff.getLineNumber()
-    //            << std::setw(70) << diff.getFirstFileContent()
-    //            << std::setw(70) << diff.getSecondFileContent() << std::endl;
-    //    }
-    //    std::cout << std::endl;
-    //}
 };
 
 // Handles merging of two files
-class Merger {
-
-public:
-    std::vector<std::string> mergeFiles(const std::vector<std::string>& firstFileContent, 
-        const std::vector<std::string>& secondFileContent, 
-        const std::vector<Difference>& differences) {
-        std::vector<std::string> mergedContent;
-
-        ////size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
-        //size_t diffIndex = 0;
-
-        //for (size_t i = 0; i < maxLines; i++) {
-        //    if (diffIndex < differences.size() && i + 1 == differences[diffIndex].getLineNumber()) {
-        //        std::cout << "Line " << (i + 1) << " differs:\n";
-        //        std::cout << "1: " << differences[diffIndex].getFirstFileContent() << "\n";
-        //        std::cout << "2: " << differences[diffIndex].getSecondFileContent() << "\n";
-        //        std::cout << "Choose which line to save (1/2): ";
-
-        //        // FR.5
-        //        std::string choice;
-        //        std::cin >> choice;
-        //        while (choice != "1" && choice != "2") {
-        //            std::cout << "Invalid choice. Please enter 1 or 2: ";
-        //            std::cin >> choice;
-        //        }
-
-        //        mergedContent.push_back(choice == "1" ? differences[diffIndex].getFirstFileContent() : differences[diffIndex].getSecondFileContent());
-        //        diffIndex++;
-        //    }
-        //    else {
-        //        // To be improved, should be based on the user's choice but not based on file size
-        //        std::string line = (firstFileContent.size() > secondFileContent.size()) ? firstFileContent[i] : secondFileContent[i];
-        //        mergedContent.push_back(line);
-        //    }
-        //}
-        return mergedContent;
-    }
-};
+//class Merger {
+//
+//public:
+//    std::vector<std::string> mergeFiles(const std::vector<std::string>& firstFileContent, 
+//        const std::vector<std::string>& secondFileContent, 
+//        const std::vector<Difference>& differences) {
+//        std::vector<std::string> mergedContent;
+//
+//        //size_t maxLines = std::max(firstFileContent.size(), secondFileContent.size());
+//        size_t diffIndex = 0;
+//
+//        for (size_t i = 0; i < maxLines; i++) {
+//            if (diffIndex < differences.size() && i + 1 == differences[diffIndex].getLineNumber()) {
+//                std::cout << "Line " << (i + 1) << " differs:\n";
+//                std::cout << "1: " << differences[diffIndex].getFirstFileContent() << "\n";
+//                std::cout << "2: " << differences[diffIndex].getSecondFileContent() << "\n";
+//                std::cout << "Choose which line to save (1/2): ";
+//
+//                // FR.5
+//                std::string choice;
+//                std::cin >> choice;
+//                while (choice != "1" && choice != "2") {
+//                    std::cout << "Invalid choice. Please enter 1 or 2: ";
+//                    std::cin >> choice;
+//                }
+//
+//                mergedContent.push_back(choice == "1" ? differences[diffIndex].getFirstFileContent() : differences[diffIndex].getSecondFileContent());
+//                diffIndex++;
+//            }
+//            else {
+//                // To be improved, should be based on the user's choice but not based on file size
+//                std::string line = (firstFileContent.size() > secondFileContent.size()) ? firstFileContent[i] : secondFileContent[i];
+//                mergedContent.push_back(line);
+//            }
+//        }
+//        return mergedContent;
+//    }
+//};
 
 
 // Represents the final merged file
-class OutputFile {
-
-    std::vector<std::string> content;
-
-public:
-    OutputFile(const std::vector<std::string>& content) : content(content) {}
-
-    void saveContent(const std::string& outputPath) {
-        std::ofstream outputFile(outputPath);
-        if (!outputFile)
-            throw std::runtime_error("Failed to save file: " + outputPath);
-        
-        for (const auto& line : content) {
-            outputFile << line << "\n";
-        }
-        outputFile.close();
-    }
-
-    // FR.9 
-    void fileModification(const std::string& path) {
-
-        // User defined modification
-        std::cout << std::endl;
-        std::cout << "Do you want to modify the output file? Enter \"Y\" if you want.\n";
-        std::string choice;
-        std::cin >> choice;
-        if (choice == "Y")
-            modifyFileContent(path);       
-        else
-            std::cout << "Program closed. Please check the output file accordingly.\n";
-    }
-
-    // FR.9
-    void modifyFileContent(const std::string& path) {
-
-        std::cout << "Enter the line number and the content you want to changed.\n";
-        std::cout << "Line number: ";
-        std::string lineNumber;
-        std::cin >> lineNumber;
-        std::cout << "Content to be changed: ";
-        std::string newContent;
-        std::cin >> newContent;
-        std::cout << std::endl;
-
-        std::ifstream inputFile(path);
-        if (!inputFile)
-            throw std::runtime_error("File not found: " + path);
-
-        // Read the file into a vector of strings
-        std::vector<std::string> lines;
-        std::string line;
-        size_t currentLine = 1; // Line numbers start from 1
-
-        while (std::getline(inputFile, line)) {
-            if (currentLine == std::stoull(lineNumber)) {
-                line = newContent; // Modify the specific line
-            }
-            lines.push_back(line);
-            currentLine++;
-        }
-        inputFile.close();
-
-        // If the specified line number is larger than the number of lines in the file
-        if (std::stoull(lineNumber) > lines.size()) {
-            std::cerr << "Error: The specified line number " << lineNumber << " exceeds the number of lines in the file.\n";
-            return; // fileModification(path) is possible for further changes after error popping out, should be implemented on GUI
-        }
-
-        // Write the modified lines back to the file
-        std::ofstream outputFile(path, std::ios::out); // Open the file for writing (truncate mode)
-        if (!outputFile)
-            throw std::runtime_error("Error: Unable to open file \"" + path + "\" for writing.");
-
-        for (const auto& modifiedLine : lines) {
-            outputFile << modifiedLine << "\n";
-        }
-        outputFile.close();
-
-        std::cout << "Output file changed and saved accordingly.\n";
-
-        fileModification(path);
-    }
-};
+//class OutputFile {
+//
+//    std::vector<std::string> content;
+//
+//public:
+//    OutputFile(const std::vector<std::string>& content) : content(content) {}
+//
+//    void saveContent(const std::string& outputPath) {
+//        std::ofstream outputFile(outputPath);
+//        if (!outputFile)
+//            throw std::runtime_error("Failed to save file: " + outputPath);
+//        
+//        for (const auto& line : content) {
+//            outputFile << line << "\n";
+//        }
+//        outputFile.close();
+//    }
+//
+//    // FR.9 
+//    void fileModification(const std::string& path) {
+//
+//        // User defined modification
+//        std::cout << std::endl;
+//        std::cout << "Do you want to modify the output file? Enter \"Y\" if you want.\n";
+//        std::string choice;
+//        std::cin >> choice;
+//        if (choice == "Y")
+//            modifyFileContent(path);       
+//        else
+//            std::cout << "Program closed. Please check the output file accordingly.\n";
+//    }
+//
+//    // FR.9
+//    void modifyFileContent(const std::string& path) {
+//
+//        std::cout << "Enter the line number and the content you want to changed.\n";
+//        std::cout << "Line number: ";
+//        std::string lineNumber;
+//        std::cin >> lineNumber;
+//        std::cout << "Content to be changed: ";
+//        std::string newContent;
+//        std::cin >> newContent;
+//        std::cout << std::endl;
+//
+//        std::ifstream inputFile(path);
+//        if (!inputFile)
+//            throw std::runtime_error("File not found: " + path);
+//
+//        // Read the file into a vector of strings
+//        std::vector<std::string> lines;
+//        std::string line;
+//        size_t currentLine = 1; // Line numbers start from 1
+//
+//        while (std::getline(inputFile, line)) {
+//            if (currentLine == std::stoull(lineNumber)) {
+//                line = newContent; // Modify the specific line
+//            }
+//            lines.push_back(line);
+//            currentLine++;
+//        }
+//        inputFile.close();
+//
+//        // If the specified line number is larger than the number of lines in the file
+//        if (std::stoull(lineNumber) > lines.size()) {
+//            std::cerr << "Error: The specified line number " << lineNumber << " exceeds the number of lines in the file.\n";
+//            return; // fileModification(path) is possible for further changes after error popping out, should be implemented on GUI
+//        }
+//
+//        // Write the modified lines back to the file
+//        std::ofstream outputFile(path, std::ios::out); // Open the file for writing (truncate mode)
+//        if (!outputFile)
+//            throw std::runtime_error("Error: Unable to open file \"" + path + "\" for writing.");
+//
+//        for (const auto& modifiedLine : lines) {
+//            outputFile << modifiedLine << "\n";
+//        }
+//        outputFile.close();
+//
+//        std::cout << "Output file changed and saved accordingly.\n";
+//
+//        fileModification(path);
+//    }
+//};
 
 
 //// Main Program

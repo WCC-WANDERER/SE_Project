@@ -60,13 +60,10 @@ namespace TextFileManagerUI
                 Title = "Select your first file"
             };
 
-            //string CombinedPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..");
-            //fileDialog.InitialDirectory = System.IO.Path.GetFullPath(CombinedPath);
             fileDialog.InitialDirectory = System.IO.Path.GetFullPath(Directory.GetCurrentDirectory());
 
             if (fileDialog.ShowDialog() == true)
             {
-                //File1Path.Text = fileDialog.FileName;
                 File1Path.Text = fileDialog.SafeFileName;
             }
             else
@@ -120,7 +117,7 @@ namespace TextFileManagerUI
         }
 
         // Event handler for Compare Files
-        private void CompareFiles_Click(object sender, RoutedEventArgs e)
+        internal async void CompareFiles_Click(object sender, RoutedEventArgs e)
         {
             // Initialize file path
             string file1Path = File1Path.Text;
@@ -163,7 +160,9 @@ namespace TextFileManagerUI
             try
             {
                 // Call the function
-                FileComparisonResult result = CompareFiles(file1Path, file2Path);
+                // Run the file comparison asynchronously
+                var result = await Task.Run(() => CompareFiles(file1Path, file2Path));
+                //FileComparisonResult result = CompareFiles(file1Path, file2Path);
 
                 // Use the content and differences as needed
                 firstFileContent = Marshal.PtrToStringAnsi(result.file1ReturnContent);
@@ -205,42 +204,41 @@ namespace TextFileManagerUI
                 ModifyFileButton.IsEnabled = true;
                 MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-
-                //// Check the extension of the files and delete the temporary .txt files if necessary
-                //if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
-                //{
-                //    // Remove extension from file1Path and add .txt
-                //    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
-                //    if (File.Exists(tempFile1Path))
-                //    {
-                //        try
-                //        {
-                //            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
-                //            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                //        }
-                //    }
-                //}
-                //if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
-                //{
-                //    // Remove extension from file2Path and add .txt
-                //    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
-                //    if (File.Exists(tempFile2Path))
-                //    {
-                //        try
-                //        {
-                //            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
-                //            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                //        }
-                //    }
-                //}
+                // Check the extension of the files and delete the temporary .txt files if necessary
+                /*if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
+                {
+                    // Remove extension from file1Path and add .txt
+                    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
+                    if (File.Exists(tempFile1Path))
+                    {
+                        try
+                        {
+                            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
+                            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
+                {
+                    // Remove extension from file2Path and add .txt
+                    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
+                    if (File.Exists(tempFile2Path))
+                    {
+                        try
+                        {
+                            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
+                            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }*/
             }
             catch (Exception ex)
             {
@@ -249,7 +247,7 @@ namespace TextFileManagerUI
         }
 
         // Event handler for Save Output
-        private void SaveOutput_Click(object sender, RoutedEventArgs e)
+        internal void SaveOutput_Click(object sender, RoutedEventArgs e)
         {
             if (!isComparisonDone)
             {
@@ -306,7 +304,8 @@ namespace TextFileManagerUI
                 Filter = filter,
                 Title = "Save Output File",
                 DefaultExt = selectedFormat,
-                FileName = OutputFileName.Text + selectedFormat // Default file name with the correct format
+                FileName = OutputFileName.Text + selectedFormat, // Default file name with the correct format
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory // Set initial directory to project directory
             };
 
             if (saveFileDialog.ShowDialog() == true)
@@ -327,7 +326,7 @@ namespace TextFileManagerUI
         }
 
         // Event handler for Modify the Output File
-        private void ModifyFile_Click(object sender, RoutedEventArgs e)
+        internal void ModifyFile_Click(object sender, RoutedEventArgs e)
         {
             if (!isComparisonDone)
             {

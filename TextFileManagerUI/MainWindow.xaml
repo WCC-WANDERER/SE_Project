@@ -34,7 +34,7 @@
         </StackPanel>
 
         <!-- Compare Files Button (Positioned Below File 1 Browse) -->
-        <Button Content="Compare Files" FontSize="14" Width="130" Height="40" Grid.Row="1" 
+        <Button x:Name="CompareFileButton" Content="Compare Files" FontSize="14" Width="130" Height="40" Grid.Row="1" 
                 HorizontalAlignment="Left" Margin="20,0,0,10" Click="CompareFiles_Click"/>
 
         <!-- Differences Table -->
