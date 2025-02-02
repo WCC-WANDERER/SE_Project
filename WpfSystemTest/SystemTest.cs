@@ -26,7 +26,7 @@ namespace WpfSystemTests
 
         // Functional testing - Comparing input files
         [Test]
-        public void CompareFilesButton_ShouldInvokeComparison_WhenClicked()
+        public async Task CompareFilesButton_ShouldInvokeComparison_WhenClicked()
         {
             // Arrange
             var compareButton = _mainWindow.FindName("CompareFileButton") as Button;
@@ -50,13 +50,17 @@ namespace WpfSystemTests
 
             compareButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
+            // Wait until the CompareFiles function finished on background thread,
+            // otherwise Assert.IsTrue will be faster than the CompareFiles function, leading to failing of test
+            await Task.Delay(1000);  // delay value depends on the estimated time required for CompareFiles function, allow more time in case of large files
+
             // Assert: Check that the comparison result has been populated in the Differences collection
             Assert.IsTrue(_mainWindow.Differences.Count > 0); // Verify the differences collection
         }
 
         // Functional testing - Saving output file
         [Test]
-        public void SaveOutput_Click_ShouldSaveFile_WhenComparisonDone()
+        public async Task SaveOutput_Click_ShouldSaveFile_WhenComparisonDone()
         {
             // Arrange
             var saveButton = _mainWindow.FindName("SaveOutputButton") as Button;
@@ -82,6 +86,10 @@ namespace WpfSystemTests
 
             // Manually trigger the comparison (this would be done earlier in your application)
             _mainWindow.CompareFiles_Click(null, null);
+
+            // Wait until the CompareFiles function finished on background thread,
+            // otherwise Assert.IsTrue will be faster than the CompareFiles function, leading to failing of test
+            await Task.Delay(1000);  // delay value depends on the estimated time required for CompareFiles function, allow more time in case of large files
 
             // Act - Trigger the SaveOutput click
             saveButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

@@ -160,7 +160,7 @@ namespace TextFileManagerUI
             try
             {
                 // Call the function
-                // Run the file comparison asynchronously
+                // Run the file comparison asynchronously to prevent UI thread being freezed for large files comparison
                 var result = await Task.Run(() => CompareFiles(file1Path, file2Path));
                 //FileComparisonResult result = CompareFiles(file1Path, file2Path);
 
@@ -174,71 +174,76 @@ namespace TextFileManagerUI
                 FreeMemory(result.file2ReturnContent);
                 FreeMemory(result.differences);
 
-                // Parse the differences and update the ObservableCollection
-                Differences.Clear();
-                string[] diffLines = differences.Split('\n');
-                foreach (string line in diffLines)
+                // Using Dispatcher to safely update UI after background task
+                Dispatcher.Invoke(() =>
                 {
-                    if (!string.IsNullOrEmpty(line))
+
+                    // Parse the differences and update the ObservableCollection
+                    Differences.Clear();
+                    string[] diffLines = differences.Split('\n');
+                    foreach (string line in diffLines)
                     {
-                        var parts = line.Split(new[] { ": File1 -> ", ", File2 -> " }, StringSplitOptions.None);
-                        if (parts.Length == 3)
+                        if (!string.IsNullOrEmpty(line))
                         {
-                            Differences.Add(new LineDifference
+                            var parts = line.Split(new[] { ": File1 -> ", ", File2 -> " }, StringSplitOptions.None);
+                            if (parts.Length == 3)
                             {
-                                LineNumber = int.Parse(parts[0].Replace("Line", "").Trim()),
-                                File1Content = parts[1].Trim(),
-                                File2Content = parts[2].Trim(),
-                                UseFile1 = true,  // Default selection
-                                UseFile2 = false
-                            });
+                                Differences.Add(new LineDifference
+                                {
+                                    LineNumber = int.Parse(parts[0].Replace("Line", "").Trim()),
+                                    File1Content = parts[1].Trim(),
+                                    File2Content = parts[2].Trim(),
+                                    UseFile1 = true,  // Default selection
+                                    UseFile2 = false
+                                });
+                            }
                         }
                     }
-                }
 
-                // Set the flag to true after comparison is done
-                isComparisonDone = true;
+                    // Set the flag to true after comparison is done
+                    isComparisonDone = true;
 
-                // Enable the "Save Output" and "Modify File" buttons
-                SaveOutputButton.IsEnabled = true;
-                ModifyFileButton.IsEnabled = true;
-                MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Enable the "Save Output" and "Modify File" buttons
+                    SaveOutputButton.IsEnabled = true;
+                    ModifyFileButton.IsEnabled = true;
+                    MessageBox.Show("Comparison completed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Check the extension of the files and delete the temporary .txt files if necessary
-                /*if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
-                {
-                    // Remove extension from file1Path and add .txt
-                    string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
-                    if (File.Exists(tempFile1Path))
+                    // Check the extension of the files and delete the temporary .txt files if necessary
+                    /*if (System.IO.Path.GetExtension(file1Path).ToLower() != ".txt")
                     {
-                        try
+                        // Remove extension from file1Path and add .txt
+                        string tempFile1Path = System.IO.Path.GetFileNameWithoutExtension(file1Path) + ".txt";
+                        if (File.Exists(tempFile1Path))
                         {
-                            File.SetAttributes(tempFile1Path, FileAttributes.Normal);
-                            File.Delete(tempFile1Path); // Delete the converted .txt file for file1
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            try
+                            {
+                                File.SetAttributes(tempFile1Path, FileAttributes.Normal);
+                                File.Delete(tempFile1Path); // Delete the converted .txt file for file1
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Error deleting temporary file for {file1Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
                         }
                     }
-                }
-                if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
-                {
-                    // Remove extension from file2Path and add .txt
-                    string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
-                    if (File.Exists(tempFile2Path))
+                    if (System.IO.Path.GetExtension(file2Path).ToLower() != ".txt")
                     {
-                        try
+                        // Remove extension from file2Path and add .txt
+                        string tempFile2Path = System.IO.Path.GetFileNameWithoutExtension(file2Path) + ".txt";
+                        if (File.Exists(tempFile2Path))
                         {
-                            File.SetAttributes(tempFile2Path, FileAttributes.Normal);
-                            File.Delete(tempFile2Path); // Delete the converted .txt file for file2
+                            try
+                            {
+                                File.SetAttributes(tempFile2Path, FileAttributes.Normal);
+                                File.Delete(tempFile2Path); // Delete the converted .txt file for file2
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error deleting temporary file for {file2Path}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }*/
+                    }*/
+                });
             }
             catch (Exception ex)
             {
