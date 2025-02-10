@@ -124,7 +124,9 @@ public:
 
         // Set file attributes to normal (if it exists)
         if (std::filesystem::exists(outputFilePath)) {
+
             if (!SetFileAttributes(std::filesystem::path(outputFilePath).c_str(), FILE_ATTRIBUTE_NORMAL)) {
+
                 DWORD error = GetLastError();
                 std::cerr << "Failed to set file attributes to normal for: " << outputFilePath
                     << ". Error Code: " << error << std::endl;
@@ -287,7 +289,6 @@ public:
 
         while (true)
         {
-            //std::string line1, line2;
             bool gotLine1 = static_cast<bool>(std::getline(file1, line1));
             bool gotLine2 = static_cast<bool>(std::getline(file2, line2));
             lineNumber++;

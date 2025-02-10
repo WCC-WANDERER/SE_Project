@@ -25,12 +25,12 @@
             <TextBlock Text="File 1:" FontSize="14" Height="30" VerticalAlignment="Center" Margin="0,5,10,0"/>
             <TextBox x:Name="File1Path" FontSize="14" Width="300" Height="30" IsReadOnly="True" 
                      Margin="0,0,10,0" VerticalContentAlignment="Center"/>
-            <Button Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile1_Click"/>
+            <Button x:Name="BrowseButton1" Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile1_Click"/>
 
             <TextBlock Text="File 2:" FontSize="14" Height="30" VerticalAlignment="Center" Margin="20,5,10,0"/>
             <TextBox x:Name="File2Path" FontSize="14" Width="300" Height="30" IsReadOnly="True" 
                      Margin="0,0,10,0" VerticalContentAlignment="Center"/>
-            <Button Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile2_Click"/>
+            <Button x:Name="BrowseButton2" Content="Browse" FontSize="12" Width="80" Height="30" Click="BrowseFile2_Click"/>
         </StackPanel>
 
         <!-- Compare Files Button (Positioned Below File 1 Browse) -->

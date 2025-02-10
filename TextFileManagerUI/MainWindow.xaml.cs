@@ -46,12 +46,12 @@ namespace TextFileManagerUI
         public MainWindow()
         {
             InitializeComponent();
-            Differences = new ObservableCollection<LineDifference>();
+            Differences = new ObservableCollection<LineDifference>(); // DataGrid for GUI 
             DifferencesGrid.ItemsSource = Differences; // Bind DataGrid to the Differences collection
             DifferencesGrid.DataContext = this; // Bind the DataContext to this window so the binding works
         }
 
-        // Event handler for Browse first file
+        // Event handler for Browsing first file
         private void BrowseFile1_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog
@@ -72,7 +72,7 @@ namespace TextFileManagerUI
             }
         }
 
-        // Event handler for Browse second file
+        // Event handler for Browsing second file
         private void BrowseFile2_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog
